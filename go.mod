@@ -15,7 +15,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/websocket v1.5.3
 	github.com/patrickmn/go-cache v2.1.0+incompatible
-	github.com/sashabaranov/go-openai v1.37.0
+	github.com/sashabaranov/go-openai v1.41.2
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.980
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/hunyuan v1.0.980
 	github.com/volcengine/volcengine-go-sdk v1.0.183
@@ -102,4 +102,4 @@ require (
 	gopkg.in/yaml.v2 v2.2.8 // indirect
 )
 
-replace github.com/sashabaranov/go-openai => github.com/fruitbars/go-openai v0.0.0-20250220100151-4c445df9de24
+// replace github.com/sashabaranov/go-openai => github.com/fruitbars/go-openai v0.0.0-20250220100151-4c445df9de24

@@ -14,7 +14,8 @@ type ChatResponse struct {
 }
 
 type ChatMessage struct {
-	Role    string   `json:"role"`
-	Content string   `json:"content"`
-	Images  []string `json:"images,omitempty"`
+	Role     string   `json:"role"`
+	Content  string   `json:"content"`
+	Thinking *string  `json:"thinking"`
+	Images   []string `json:"images,omitempty"`
 }

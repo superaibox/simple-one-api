@@ -1,9 +1,6 @@
 package main
 
 import (
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 	"log"
 	"net/http"
 	"simple-one-api/pkg/apis"
@@ -13,6 +10,10 @@ import (
 	"simple-one-api/pkg/mywebui"
 	"simple-one-api/pkg/translation"
 	"strings"
+
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 
 	//"log"
 	"os"

@@ -4,6 +4,7 @@ type ChatRequest struct {
 	Model     string               `json:"model"`
 	Messages  []Message            `json:"messages"`
 	Stream    bool                 `json:"stream"`
+	Think     *bool                `json:"think,omitempty"`
 	Format    string               `json:"format,omitempty"`
 	Options   AdvancedModelOptions `json:"options,omitempty"`
 	KeepAlive string               `json:"keep_alive,omitempty"`

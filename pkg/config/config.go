@@ -4,15 +4,16 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/google/uuid"
-	"go.uber.org/zap"
-	"gopkg.in/yaml.v3"
 	"log"
 	"os"
 	"simple-one-api/pkg/mylog"
 	"simple-one-api/pkg/utils"
 	"sort"
 	"strings"
+
+	"github.com/google/uuid"
+	"go.uber.org/zap"
+	"gopkg.in/yaml.v3"
 )
 
 var GSOAConf *Configuration
@@ -68,6 +69,7 @@ type ServiceModel struct {
 	Limit           Limit                    `json:"limit" yaml:"limit"`
 	UseProxy        *bool                    `json:"use_proxy,omitempty" yaml:"use_proxy,omitempty"`
 	Timeout         int                      `json:"timeout" yaml:"timeout"`
+	Think           *bool                    `json:"think,omitempty" yaml:"think,omitempty"`
 }
 
 type ProxyConf struct {

@@ -6,10 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
-	"github.com/sashabaranov/go-openai"
-	"go.uber.org/zap"
 	"io"
 	"net/http"
 	"net/url"
@@ -20,6 +16,11 @@ import (
 	"simple-one-api/pkg/mylog"
 	"simple-one-api/pkg/utils"
 	"strings"
+
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	"github.com/sashabaranov/go-openai"
+	"go.uber.org/zap"
 )
 
 // validateAndFormatURL checks if the given URL matches the specified formats and returns the formatted URL
@@ -202,8 +203,8 @@ func handleOpenAIOpenAIStreamRequest(c *gin.Context, client *openai.Client, ctx 
 			response.ID = backIdStr
 		}
 
-		if len(response.Choices) > 0 && response.Choices[0].Delta.ReasoningContent != "" && response.Choices[0].Delta.Reasoning == "" {
-			response.Choices[0].Delta.Reasoning = response.Choices[0].Delta.ReasoningContent
+		if len(response.Choices) > 0 && response.Choices[0].Delta.ReasoningContent != "" && response.Choices[0].Delta.ReasoningContent == "" {
+			response.Choices[0].Delta.ReasoningContent = response.Choices[0].Delta.ReasoningContent
 		}
 
 		adapter.CheckOpenAIStreamRespone(response)
@@ -239,8 +240,8 @@ func handleOpenAIStandardRequest(c *gin.Context, client *openai.Client, ctx cont
 		return err
 	}
 
-	if len(resp.Choices) > 0 && resp.Choices[0].Message.ReasoningContent != "" && resp.Choices[0].Message.Reasoning == "" {
-		resp.Choices[0].Message.Reasoning = resp.Choices[0].Message.ReasoningContent
+	if len(resp.Choices) > 0 && resp.Choices[0].Message.ReasoningContent != "" && resp.Choices[0].Message.ReasoningContent == "" {
+		resp.Choices[0].Message.ReasoningContent = resp.Choices[0].Message.ReasoningContent
 	}
 
 	myResp := adapter.OpenAIResponseToOpenAIResponse(&resp)
@@ -311,7 +312,7 @@ func OpenAI2OpenAIHandler(c *gin.Context, oaiReqParam *OAIRequestParam) error {
 	case ReasoningNone:
 	case ReasoningR1:
 	case ReasoningOpenrouterR1:
-		oaiReqParam.chatCompletionReq.IncludeReasoning = true
+		// oaiReqParam.chatCompletionReq.IncludeReasoning = true
 	}
 
 	return handleOpenAIOpenAIRequest(conf, c, oaiReqParam.chatCompletionReq, clientModel)

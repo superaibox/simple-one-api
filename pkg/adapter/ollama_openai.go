@@ -1,11 +1,12 @@
 package adapter
 
 import (
-	"github.com/google/uuid"
-	"github.com/sashabaranov/go-openai"
 	"simple-one-api/pkg/llm/ollama"
 	myopenai "simple-one-api/pkg/openai"
 	"simple-one-api/pkg/utils"
+
+	"github.com/google/uuid"
+	"github.com/sashabaranov/go-openai"
 )
 
 const (
@@ -59,12 +60,18 @@ func OllamaResponseToOpenAIResponse(resp *ollama.ChatResponse) *myopenai.OpenAIR
 		return nil
 	}
 
+	content := ""
+	if resp.Message.Thinking != nil {
+		content += "<think>\n" + *resp.Message.Thinking + "<think>\n\n"
+	}
+	content += resp.Message.Content
+
 	choices := []myopenai.Choice{
 		{
 			Index: 0,
 			Message: myopenai.ResponseMessage{
 				Role:    resp.Message.Role,
-				Content: resp.Message.Content,
+				Content: content,
 			},
 			//FinishReason: determineFinishReason(resp.Done),
 		},
@@ -99,13 +106,20 @@ func OllamaResponseToOpenAIStreamResponse(resp *ollama.ChatResponse) *myopenai.O
 		return nil
 	}
 
+	var content string
+	if resp.Message.Thinking != nil {
+		content = *resp.Message.Thinking
+	} else {
+		content = resp.Message.Content
+	}
+
 	//log.Println(resp.Message.Role, resp.Message.Content)
 	choices := []myopenai.OpenAIStreamResponseChoice{
 		{
 			Index: 0,
 			Delta: myopenai.ResponseDelta{
 				Role:    resp.Message.Role,
-				Content: resp.Message.Content,
+				Content: content,
 			},
 		},
 	}

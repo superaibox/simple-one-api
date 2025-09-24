@@ -4,9 +4,6 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"github.com/gin-gonic/gin"
-	"github.com/sashabaranov/go-openai"
-	"go.uber.org/zap"
 	"io"
 	"net/http"
 	"simple-one-api/pkg/adapter"
@@ -17,6 +14,10 @@ import (
 	"simple-one-api/pkg/utils"
 	"strings"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/sashabaranov/go-openai"
+	"go.uber.org/zap"
 )
 
 var defaultReqTimeout = 120
@@ -79,9 +80,10 @@ func logOpenAIChatCompletionRequest(oaiReq *openai.ChatCompletionRequest) {
 		return
 	}
 
+	// zap.Bool("IncludeReasoning", oaiReq.IncludeReasoning),
 	mylog.Logger.Info("logOpenAIChatCompletionRequest", zap.Float32("TopP", oaiReq.TopP),
 		zap.Float32("Temperature", oaiReq.Temperature), zap.Int("MaxTokens", oaiReq.MaxTokens),
-		zap.String("model", oaiReq.Model), zap.Bool("IncludeReasoning", oaiReq.IncludeReasoning), zap.Int("N", oaiReq.N), zap.Float32("FrequencyPenalty", oaiReq.FrequencyPenalty))
+		zap.String("model", oaiReq.Model), zap.Int("N", oaiReq.N), zap.Float32("FrequencyPenalty", oaiReq.FrequencyPenalty))
 }
 
 func getBodyDataCopy(c *gin.Context) ([]byte, error) {
