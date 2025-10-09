@@ -26,7 +26,23 @@ var Debug bool
 var LogLevel string
 var SupportModels map[string]string
 var GlobalModelRedirect map[string]string
-var SupportMultiContentModels = []string{"gpt-4o", "gpt-4-turbo", "glm-4v", "gemini-*", "yi-vision", "gpt-4o*"}
+
+func GetSupportMultiContentModels() []string {
+	SupportMultiContentModels := []string{"gpt-4o", "gpt-4-turbo", "glm-4v", "gemini-*", "yi-vision", "gpt-4o*", "gpt-4o*"}
+	EXTRA_MULTI_MODELS := os.Getenv("EXTRA_MULTI_MODELS")
+	if EXTRA_MULTI_MODELS != "" {
+		parts := strings.Split(EXTRA_MULTI_MODELS, ",")
+		for _, p := range parts {
+			p = strings.TrimSpace(p)
+			if p != "" {
+				SupportMultiContentModels = append(SupportMultiContentModels, p)
+			}
+		}
+	}
+	return SupportMultiContentModels
+}
+
+var SupportMultiContentModels = GetSupportMultiContentModels()
 
 // var SupportReasoningModels = []string{"deepseek-reasoner", "gpt-4-turbo"}
 var GProxyConf *ProxyConf

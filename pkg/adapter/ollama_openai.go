@@ -4,6 +4,7 @@ import (
 	"simple-one-api/pkg/llm/ollama"
 	myopenai "simple-one-api/pkg/openai"
 	"simple-one-api/pkg/utils"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/sashabaranov/go-openai"
@@ -19,9 +20,23 @@ const (
 func OpenAIRequestToOllamaRequest(oaiReq *openai.ChatCompletionRequest) *ollama.ChatRequest {
 	messages := make([]ollama.Message, len(oaiReq.Messages))
 	for i, msg := range oaiReq.Messages {
+		images := make([]string, 0)
+		content := ""
+		for _, c := range msg.MultiContent {
+			switch c.Type {
+			case "image_url":
+				pos := strings.Index(c.ImageURL.URL, ",")
+				if pos != -1 {
+					images = append(images, c.ImageURL.URL[pos+1:])
+				}
+			case "text":
+				content += c.Text
+			}
+		}
 		messages[i] = ollama.Message{
 			Role:    msg.Role,
-			Content: msg.Content,
+			Content: content,
+			Images:  images,
 		}
 	}
 
