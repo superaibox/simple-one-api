@@ -22,17 +22,22 @@ func OpenAIRequestToOllamaRequest(oaiReq *openai.ChatCompletionRequest) *ollama.
 	for i, msg := range oaiReq.Messages {
 		images := make([]string, 0)
 		content := ""
-		for _, c := range msg.MultiContent {
-			switch c.Type {
-			case "image_url":
-				pos := strings.Index(c.ImageURL.URL, ",")
-				if pos != -1 {
-					images = append(images, c.ImageURL.URL[pos+1:])
+		if len(msg.MultiContent) > 0 {
+			for _, c := range msg.MultiContent {
+				switch c.Type {
+				case "image_url":
+					pos := strings.Index(c.ImageURL.URL, ",")
+					if pos != -1 {
+						images = append(images, c.ImageURL.URL[pos+1:])
+					}
+				case "text":
+					content += c.Text
 				}
-			case "text":
-				content += c.Text
 			}
+		} else {
+			content = msg.Content
 		}
+
 		messages[i] = ollama.Message{
 			Role:    msg.Role,
 			Content: content,

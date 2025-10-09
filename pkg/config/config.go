@@ -440,6 +440,9 @@ func IsSupportMultiContent(model string) bool {
 	for _, item := range SupportMultiContentModels {
 		if strings.HasSuffix(item, "*") {
 			prefix := strings.TrimSuffix(item, "*")
+			if prefix == "" {
+				return true
+			}
 			if strings.HasPrefix(model, prefix) {
 				return true
 			}
