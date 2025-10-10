@@ -3,8 +3,6 @@ package embedding
 import (
 	"context"
 	"errors"
-	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 	"net/http"
 	"simple-one-api/pkg/config"
 	"simple-one-api/pkg/embedding/baiduqianfan"
@@ -14,6 +12,9 @@ import (
 	"simple-one-api/pkg/mylog"
 	"simple-one-api/pkg/utils"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 func EmbeddingsHandler(c *gin.Context) {
@@ -34,8 +35,9 @@ func EmbeddingsHandler(c *gin.Context) {
 
 	clientModel := oaiEmbReq.Model
 	mrModel := config.GetModelRedirect(s, serviceModelName)
+	mpModel := config.GetModelMapping(s, mrModel)
 
-	oaiEmbReq.Model = mrModel
+	oaiEmbReq.Model = mpModel
 
 	mylog.Logger.Info("Service details",
 		zap.String("service_name", s.ServiceName),
@@ -75,7 +77,7 @@ func EmbeddingsHandler(c *gin.Context) {
 	case "qianfan":
 		oaiResp, err = baiduqianfan.BaiduQianfanEmbedding(&oaiEmbReq, apiKey, secretKey, proxyTransport)
 	case "openai":
-		oaiResp, err = oai.OpenAIEmbedding(&oaiEmbReq, apiKey, proxyTransport)
+		oaiResp, err = oai.OpenAIEmbedding(&oaiEmbReq, apiKey, proxyTransport, s.ServerURL)
 	default:
 		mylog.Logger.Error("Unsupported service", zap.String("service", s.ServiceName))
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Unsupported service"})
