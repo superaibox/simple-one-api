@@ -90,10 +90,10 @@ func handleOllamaRequest(c *gin.Context, s *config.ModelDetails, ollamaRequest *
 		return err
 	}
 
-	return processOllamaResponseBody(c, resp, ollamaRequest.Stream, oaiReqParam)
+	return processOllamaResponseBody(c, s, resp, ollamaRequest.Stream, oaiReqParam)
 }
 
-func processOllamaResponseBody(c *gin.Context, resp *http.Response, stream bool, oaiReqParam *OAIRequestParam) error {
+func processOllamaResponseBody(c *gin.Context, s *config.ModelDetails, resp *http.Response, stream bool, oaiReqParam *OAIRequestParam) error {
 	clientModel := oaiReqParam.ClientModel
 	if stream {
 		utils.SetEventStreamHeaders(c)
@@ -113,6 +113,10 @@ func processOllamaResponseBody(c *gin.Context, resp *http.Response, stream bool,
 			if err != nil {
 				mylog.Logger.Error("An error occurred during unmarshal", zap.Error(err))
 				return err
+			}
+
+			if s.Think != nil && !*s.Think {
+				ollamaStreamResp.Message.Thinking = nil
 			}
 
 			isThinking := ollamaStreamResp.Message.Thinking != nil
@@ -187,7 +191,7 @@ func processOllamaResponseBody(c *gin.Context, resp *http.Response, stream bool,
 			return err
 		}
 
-		myresp := adapter.OllamaResponseToOpenAIResponse(&ollamaResp)
+		myresp := adapter.OllamaResponseToOpenAIResponse(s, &ollamaResp)
 		myresp.Model = clientModel
 		c.JSON(http.StatusOK, myresp)
 	}

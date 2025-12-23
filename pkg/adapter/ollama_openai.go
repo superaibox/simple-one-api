@@ -1,6 +1,7 @@
 package adapter
 
 import (
+	"simple-one-api/pkg/config"
 	"simple-one-api/pkg/llm/ollama"
 	myopenai "simple-one-api/pkg/openai"
 	"simple-one-api/pkg/utils"
@@ -75,9 +76,13 @@ func getFormat(format *openai.ChatCompletionResponseFormat) string {
 	}
 }
 
-func OllamaResponseToOpenAIResponse(resp *ollama.ChatResponse) *myopenai.OpenAIResponse {
+func OllamaResponseToOpenAIResponse(s *config.ModelDetails, resp *ollama.ChatResponse) *myopenai.OpenAIResponse {
 	if resp == nil {
 		return nil
+	}
+
+	if s.Think != nil && !*s.Think {
+		resp.Message.Thinking = nil
 	}
 
 	content := ""
