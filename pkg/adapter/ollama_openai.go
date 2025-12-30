@@ -1,6 +1,7 @@
 package adapter
 
 import (
+	"encoding/json"
 	"simple-one-api/pkg/config"
 	"simple-one-api/pkg/llm/ollama"
 	myopenai "simple-one-api/pkg/openai"
@@ -58,6 +59,7 @@ func OpenAIRequestToOllamaRequest(oaiReq *openai.ChatCompletionRequest) *ollama.
 		Stream:   oaiReq.Stream,
 		Options:  options,
 		Format:   getFormat(oaiReq.ResponseFormat),
+		Tools:    oaiReq.Tools,
 	}
 }
 
@@ -95,8 +97,9 @@ func OllamaResponseToOpenAIResponse(s *config.ModelDetails, resp *ollama.ChatRes
 		{
 			Index: 0,
 			Message: myopenai.ResponseMessage{
-				Role:    resp.Message.Role,
-				Content: content,
+				Role:      resp.Message.Role,
+				Content:   content,
+				ToolCalls: ConvertOllamaToolCalls(resp.Message.ToolCalls),
 			},
 			//FinishReason: determineFinishReason(resp.Done),
 		},
@@ -143,8 +146,9 @@ func OllamaResponseToOpenAIStreamResponse(resp *ollama.ChatResponse) *myopenai.O
 		{
 			Index: 0,
 			Delta: myopenai.ResponseDelta{
-				Role:    resp.Message.Role,
-				Content: content,
+				Role:      resp.Message.Role,
+				Content:   content,
+				ToolCalls: ConvertOllamaToolCalls(resp.Message.ToolCalls),
 			},
 		},
 	}
@@ -164,4 +168,30 @@ func OllamaResponseToOpenAIStreamResponse(resp *ollama.ChatResponse) *myopenai.O
 		Choices: choices,
 		Usage:   usage,
 	}
+}
+
+func ConvertOllamaToolCalls(ollamaToolCalls []ollama.OllamaToolCall) []myopenai.ToolCall {
+	result := make([]myopenai.ToolCall, 0, len(ollamaToolCalls))
+
+	for _, ollamaTC := range ollamaToolCalls {
+		// 将 map[string]interface{} 转换为 JSON 字符串
+		argsBytes, err := json.Marshal(ollamaTC.Function.Arguments)
+		if err != nil {
+			return nil
+		}
+
+		toolCall := myopenai.ToolCall{
+			Index: ollamaTC.Function.Index,
+			ID:    ollamaTC.ID,
+			// Type:  ToolTypeFunction,
+			Function: myopenai.FunctionCall{
+				Name:      ollamaTC.Function.Name,
+				Arguments: string(argsBytes),
+			},
+		}
+
+		result = append(result, toolCall)
+	}
+
+	return result
 }

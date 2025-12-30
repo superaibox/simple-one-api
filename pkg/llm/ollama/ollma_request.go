@@ -1,5 +1,7 @@
 package ollama
 
+import "github.com/sashabaranov/go-openai"
+
 type ChatRequest struct {
 	Model     string               `json:"model"`
 	Messages  []Message            `json:"messages"`
@@ -8,6 +10,7 @@ type ChatRequest struct {
 	Format    string               `json:"format,omitempty"`
 	Options   AdvancedModelOptions `json:"options,omitempty"`
 	KeepAlive string               `json:"keep_alive,omitempty"`
+	Tools     []openai.Tool        `json:"tools,omitempty"`
 }
 
 type Message struct {
