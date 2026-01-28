@@ -175,6 +175,13 @@ func CompatRecvChatStreamResponse(stream *openai.ChatCompletionStream, clientMod
 // handleStreamRequest handles streaming OpenAI requests
 func handleOpenAIOpenAIStreamRequest(c *gin.Context, client *openai.Client, ctx context.Context, req *openai.ChatCompletionRequest, clientModel string) error {
 	utils.SetEventStreamHeaders(c)
+
+	for i := range req.Messages {
+		if req.Messages[i].Content != "" {
+			req.Messages[i].MultiContent = nil
+		}
+	}
+
 	stream, err := client.CreateChatCompletionStream(ctx, *req)
 	if err != nil {
 		mylog.Logger.Error("An error occurred",
