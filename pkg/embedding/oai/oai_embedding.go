@@ -2,12 +2,58 @@ package oai
 
 import (
 	"bytes"
+	"encoding/base64"
+	"encoding/binary"
 	"encoding/json"
 	"fmt"
 	"io"
+	"math"
 	"net/http"
 	"time"
 )
+
+func (e *Embedding) UnmarshalJSON(data []byte) error {
+	// 临时结构，embedding 先用 json.RawMessage 接收
+	var raw struct {
+		Object    string          `json:"object"`
+		Embedding json.RawMessage `json:"embedding"`
+		Index     int             `json:"index"`
+	}
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	e.Object = raw.Object
+	e.Index = raw.Index
+
+	// 判断是字符串（base64）还是数组
+	if len(raw.Embedding) > 0 && raw.Embedding[0] == '"' {
+		// base64 编码的字符串
+		var encoded string
+		if err := json.Unmarshal(raw.Embedding, &encoded); err != nil {
+			return err
+		}
+		decoded, err := base64.StdEncoding.DecodeString(encoded)
+		if err != nil {
+			return fmt.Errorf("failed to decode base64 embedding: %w", err)
+		}
+		// 每个 float32 占 4 字节，小端序
+		if len(decoded)%4 != 0 {
+			return fmt.Errorf("invalid embedding byte length: %d", len(decoded))
+		}
+		floats := make([]float32, len(decoded)/4)
+		for i := range floats {
+			bits := binary.LittleEndian.Uint32(decoded[i*4 : (i+1)*4])
+			floats[i] = math.Float32frombits(bits)
+		}
+		e.Embedding = floats
+	} else {
+		// 普通 JSON 数组
+		if err := json.Unmarshal(raw.Embedding, &e.Embedding); err != nil {
+			return err
+		}
+	}
+	return nil
+}
 
 // GenerateEmbedding 生成文本的嵌入向量
 func OpenAIEmbedding(embReq *EmbeddingRequest, apiKey string, proxyTransport *http.Transport, serverURL string) (*EmbeddingResponse, error) {

@@ -14,9 +14,15 @@ type EmbeddingRequest struct {
 	Dimensions int `json:"dimensions,omitempty"`
 }
 
+type Embedding struct {
+	Object    string    `json:"object"`
+	Embedding []float32 `json:"embedding"`
+	Index     int       `json:"index"`
+}
+
 type EmbeddingResponse struct {
-	Object string             `json:"object"`
-	Data   []openai.Embedding `json:"data"`
-	Model  string             `json:"model"`
-	Usage  openai.Usage       `json:"usage"`
+	Object string       `json:"object"`
+	Data   []Embedding  `json:"data"`
+	Model  string       `json:"model"`
+	Usage  openai.Usage `json:"usage"`
 }

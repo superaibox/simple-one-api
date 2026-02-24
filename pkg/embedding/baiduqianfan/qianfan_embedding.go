@@ -4,13 +4,14 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/baidubce/bce-qianfan-sdk/go/qianfan"
-	"github.com/sashabaranov/go-openai"
 	"io"
 	"net/http"
 	"simple-one-api/pkg/embedding/oai"
 	baidu_qianfan "simple-one-api/pkg/llm/baidu-qianfan"
 	"time"
+
+	"github.com/baidubce/bce-qianfan-sdk/go/qianfan"
+	"github.com/sashabaranov/go-openai"
 )
 
 func convertOpenAIEmbeddingRequestToBaiduEmbeddingRequest(src *oai.EmbeddingRequest) *qianfan.EmbeddingRequest {
@@ -38,7 +39,7 @@ func convertOpenAIEmbeddingRequestToBaiduEmbeddingRequest(src *oai.EmbeddingRequ
 }
 
 func convertBaiduEmbeddingResponseToOpenAIEmbeddingResponse(src *qianfan.EmbeddingResponse) *oai.EmbeddingResponse {
-	var data []openai.Embedding
+	var data []oai.Embedding
 	for _, d := range src.Data {
 		// 将浮点数从 float64 转为 float32
 		embedding := make([]float32, len(d.Embedding))
@@ -46,7 +47,7 @@ func convertBaiduEmbeddingResponseToOpenAIEmbeddingResponse(src *qianfan.Embeddi
 			embedding[i] = float32(val)
 		}
 
-		data = append(data, openai.Embedding{
+		data = append(data, oai.Embedding{
 			Object:    d.Object,
 			Embedding: embedding,
 			Index:     d.Index,
